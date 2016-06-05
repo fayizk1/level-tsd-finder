@@ -36,14 +36,13 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 
 setup(
-  name='pyleveltsd-finder',
+  name='leveltsdhttp_finder',
   version='0.0.1',
-  url='https://github.com/inmobi/level-tsd-finder',
-  author='InMobi',
-  author_email='nobody@inmobi.com',
+  author='Fayiz',
+  author_email='fayizk1@gmail.com',
   license='Apache Software License 2.0',
   description='leveldb backend for carbon',
-  packages=['pyleveltsd_finder',],
+  packages=['leveltsdhttp_finder',],
   install_requires=parse_requirements('requirements.txt'),
   dependency_links=parse_dependency_links('requirements.txt'),
 )
