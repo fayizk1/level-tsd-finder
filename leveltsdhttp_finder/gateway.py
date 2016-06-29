@@ -12,11 +12,16 @@ class LevelFinder(object):
     def __init__(self, server_path=None):
         self.server = server_path or "http://127.0.0.1:8081/"
     def find_nodes(self, query):
+        print requests.compat.urljoin(self.server, "findnodes?query=%s" % query.pattern)
         resp = requests.get(requests.compat.urljoin(self.server, "findnodes?query=%s" % query.pattern))
+        print resp.status_code
         if resp.status_code != 200:
             return
+        print resp.text
         resp_obj = resp.json()
+        print resp_obj
         for v in resp_obj:
+            print v
             if v["isleaf"]:
                  yield LeafNode(v["fullname"], LevelReader(v["fullname"], self.server))
             else:
@@ -33,14 +38,18 @@ class LevelReader(object):
         return IntervalSet([Interval(1, int(time())), ])
 
     def fetch(self, startTime, endTime):
+        print requests.compat.urljoin(self.server, "queryrange?name=%s&start=%d&end=%d" % (self.metric, startTime, endTime))
         resp = requests.get(requests.compat.urljoin(self.server, "queryrange?name=%s&start=%d&end=%d" % (self.metric, startTime, endTime)))
         if resp.status_code != 200:
             return
+        print resp.status_code
         resp_obj = resp.json()
+
         self.step_in_seconds = resp_obj["step"]
         real_start = self._rounder(startTime)
         real_end = self._rounder(endTime)
-        value_map = self._round_base_data(values["points"])
+        value_map = self._round_base_data(resp_obj["points"])
+        print value_map
         ts = []
         if value_map:
             for curr in xrange(real_start, real_end, self.step_in_seconds):
@@ -59,8 +68,7 @@ class LevelReader(object):
 
     def _round_base_data(self, b):
         pts_data = {}
-        for kv in b.items():
-            z = self._rounder( kv["timestamp"])
+        for kv in b:
+            z = self._rounder(kv["timestamp"])
             pts_data[z] = kv["value"]
         return pts_data
-
