@@ -60,7 +60,7 @@ class LevelReader(object):
     def _round_base_data(self, b):
         pts_data = {}
         for kv in b.items():
-            z = self._rounder(kv["timestamp"])
+            z = self._rounder( kv["timestamp"])
             pts_data[z] = kv["value"]
         return pts_data
 
