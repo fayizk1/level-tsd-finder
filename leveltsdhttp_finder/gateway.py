@@ -10,7 +10,7 @@ import requests
 
 class LevelFinder(object):
     def __init__(self, server_path=None):
-        self.server = server_path or "http://127.0.0.1:8080/"
+        self.server = server_path or "http://127.0.0.1:8081/"
     def find_nodes(self, query):
         resp = requests.get(requests.compat.urljoin(self.server, "findnodes?query=%s" % query.pattern))
         if resp.status_code != 200:
@@ -20,7 +20,7 @@ class LevelFinder(object):
             if v["isleaf"]:
                  yield LeafNode(v["fullname"], LevelReader(v["fullname"], self.server))
             else:
-                BranchNode(v["fullname"])
+                yield BranchNode(v["fullname"])
 
 class LevelReader(object):
     def __init__(self, metric_name, server_url):
@@ -33,7 +33,7 @@ class LevelReader(object):
         return IntervalSet([Interval(1, int(time())), ])
 
     def fetch(self, startTime, endTime):
-        resp = requests.get(self.server, "queryrange?name=%s&start=%d&end=%d" % (self.metric, startTime, endTime))
+        resp = requests.get(requests.compat.urljoin(self.server, "queryrange?name=%s&start=%d&end=%d" % (self.metric, startTime, endTime)))
         if resp.status_code != 200:
             return
         resp_obj = resp.json()
@@ -60,7 +60,7 @@ class LevelReader(object):
     def _round_base_data(self, b):
         pts_data = {}
         for kv in b.items():
-            z = self._rounder(kv["Timestamp"])
-            pts_data[z] = kv["Value"]
+            z = self._rounder(kv["timestamp"])
+            pts_data[z] = kv["value"]
         return pts_data
 
